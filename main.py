@@ -5,7 +5,7 @@ from nicegui import ui, app
 from typing import Optional
 from fastapi.responses import RedirectResponse
 
-version = "v1.2.0"
+version = "v1.2.1"
 pages = []
 app.add_static_files('/static', 'static')
 
@@ -136,11 +136,11 @@ ui.button("管理", on_click=lambda: ui.open('admin'))
 with ui.card().classes("absolute-center"):
     ui.query('body').style('background: url("static/bg1.png") 0px 0px')
     ui.badge(f"岚枳的歌单 | {version}", outline=False)
-    notice_label = ui.label('搜索功能目前仅支持全字匹配').classes('text-xs self-start mr-8').style('color: rgb(230 53 79)')
+    ui.button("搜索", on_click=lambda: search())
+    notice_label = ui.label('搜索功能目前仅全字匹配').classes('text-xs self-start mr-8').style('color: rgb(230 53 79)')
     with ui.row():
         target_list_select = ui.select(["中", "日", "英"], value="中")
-        target_name = ui.input(label="关键词")
-        ui.button("搜索", on_click=lambda: search())
+        target_name = ui.input(label="关键词").style("width: 110px")
     for page in pages:
         _page = ""
         if page == "中":
