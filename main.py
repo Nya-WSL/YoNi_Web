@@ -5,7 +5,7 @@ from nicegui import ui, app
 from typing import Optional
 from fastapi.responses import RedirectResponse
 
-version = "v1.1.0"
+version = "v1.2.0"
 pages = []
 app.add_static_files('/static', 'static')
 
@@ -26,7 +26,7 @@ def page() -> Optional[RedirectResponse]:
     def try_login() -> None:
         if user[username.value] == hashlib.sha256(str(password.value).encode('utf-8')).hexdigest():
             app.storage.user.update({'user': username.value, 'authenticated': True})
-            ui.open(app.storage.user.get('referrer_path', '/add'))
+            ui.open(app.storage.user.get('referrer_path', '/admin'))
         else:
             ui.notify('账号密码错误，请重试！', color='negative')
 
@@ -39,7 +39,7 @@ def page() -> Optional[RedirectResponse]:
             ui.button('登陆', on_click=try_login)
             ui.button('返回', on_click=lambda: ui.open("/"))
 
-@ui.page('/add')
+@ui.page('/admin')
 def page():
     def add_text():
         with open(f"data/{add_list_select.value}.json", "r", encoding="utf-8") as f:
@@ -58,9 +58,51 @@ def page():
                 except:
                     ui.notify(f'在歌单[{add_list_select.value}文]中添加"{add_name.value}"失败！', color='negative')
 
+    def del_text():
+        with open(f"data/{del_list_select.value}.json", "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if del_name.value == "":
+            ui.notify('歌名为空！', color='negative')
+        else:
+            if not del_name.value in data:
+                ui.notify(f'在歌单[{del_list_select.value}文]中不存在"{del_name.value}"！', color='negative')
+            else:
+                data.remove(del_name.value)
+                try:
+                    with open(f"data/{del_list_select.value}.json", "w+", encoding="utf-8") as f:
+                        json.dump(data, f, ensure_ascii=False, indent=4)
+                    ui.notify(f'已成功在歌单[{del_list_select.value}文]中删除"{del_name.value}"！', color='positive')
+                except:
+                    ui.notify(f'在歌单[{del_list_select.value}文]中删除"{del_name.value}"失败！', color='negative')
+
+    def change_text():
+        with open(f"data/{change_list_select.value}.json", "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if old_name.value == "":
+            ui.notify('旧歌名为空！', color='negative')
+        if change_name.value == "":
+            ui.notify('新歌名为空！', color='negative')
+        else:
+            if not old_name.value in data:
+                ui.notify(f'在歌单[{change_list_select.value}文]中不存在"{old_name.value}"！', color='negative')
+            else:
+                try:
+                    index = 0
+                    for i in data:
+                        index += 1
+                        if i == old_name.value:
+                            print(index)
+                            data[index - 1] = change_name.value
+                    with open(f"data/{change_list_select.value}.json", "w", encoding="utf-8") as f:
+                        json.dump(data, f, ensure_ascii=False, indent=4)
+                    ui.notify(f'已成功修改歌单[{change_list_select.value}文]中的"{old_name.value}"为"{change_name.value}"！', color='positive')
+                except:
+                    ui.notify(f'修改歌单[{change_list_select.value}文]中的"{old_name.value}"为"{change_name.value}"失败！', color='negative')
+
     def back() -> None:
         app.storage.user.update({'authenticated': False})
         ui.open('/')
+
     if not app.storage.user.get('authenticated'):
         return RedirectResponse('/login')
 
@@ -70,10 +112,18 @@ def page():
     with ui.card().classes('absolute-center'):
         ui.badge('YoNi歌单管理处', outline=True, color='', text_color='#E6354F').classes('text-xl')
         with ui.row():
-            ui.button("添加", on_click=lambda: add_text())
-        with ui.row():
             add_list_select = ui.select(["中", "日", "英"], value="中")
             add_name = ui.input(label="歌名")
+            ui.button("添加", on_click=lambda: add_text())
+        with ui.row():
+            del_list_select = ui.select(["中", "日", "英"], value="中")
+            del_name = ui.input(label="歌名")
+            ui.button("删除", on_click=lambda: del_text())
+        with ui.row():
+            change_list_select = ui.select(["中", "日", "英"], value="中")
+            old_name = ui.input(label="旧歌名").style("width: 78px")
+            change_name = ui.input(label="新歌名").style("width: 79px")
+            ui.button("修改", on_click=lambda: change_text())
 
 for dir in os.walk("data"):
     for file in dir[2]:
@@ -81,7 +131,7 @@ for dir in os.walk("data"):
             page = str(file).replace(".json", "")
             pages.append(page)
 
-ui.button("管理", on_click=lambda: ui.open('add'))
+ui.button("管理", on_click=lambda: ui.open('admin'))
 
 with ui.card().classes("absolute-center"):
     ui.query('body').style('background: url("static/bg1.png") 0px 0px')
