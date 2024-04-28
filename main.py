@@ -1,10 +1,79 @@
 import os
 import json
+import hashlib
 from nicegui import ui, app
+from typing import Optional
+from fastapi.responses import RedirectResponse
 
-version = "v1.0.0"
+version = "v1.1.0"
 pages = []
 app.add_static_files('/static', 'static')
+
+def search():
+    with open(f"data/{target_list_select.value}.json", "r", encoding="utf-8") as f:
+        data = json.load(f)
+    if target_name.value in data:
+        notice_label.set_text(f'在歌单[{target_list_select.value}文]搜索到"{target_name.value}"')
+    elif target_name.value == "":
+        notice_label.set_text('关键词为空！')
+    else:
+        notice_label.set_text(f'未在歌单[{target_list_select.value}文]搜索到"{target_name.value}"！')
+
+@ui.page('/login')
+def page() -> Optional[RedirectResponse]:
+    with open("user.json", "r", encoding="utf-8") as f:
+        user = json.load(f)
+    def try_login() -> None:
+        if user[username.value] == hashlib.sha256(str(password.value).encode('utf-8')).hexdigest():
+            app.storage.user.update({'user': username.value, 'authenticated': True})
+            ui.open(app.storage.user.get('referrer_path', '/add'))
+        else:
+            ui.notify('账号密码错误，请重试！', color='negative')
+
+    ui.query('body').style('background: url("static/bg1.png") 0px 0px/cover')
+    with ui.card().classes('absolute-center'):
+        # ui.badge('YoNi登记处', outline=True, color='', text_color='#E6354F').classes('text-xl')
+        username = ui.input('账号').on('keydown.enter', try_login)
+        password = ui.input('密码', password=True, password_toggle_button=True).on('keydown.enter', try_login)
+        with ui.row():
+            ui.button('登陆', on_click=try_login)
+            ui.button('返回', on_click=lambda: ui.open("/"))
+
+@ui.page('/add')
+def page():
+    def add_text():
+        with open(f"data/{add_list_select.value}.json", "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if add_name.value == "":
+            ui.notify('歌名为空！', color='negative')
+        else:
+            if add_name.value in data:
+                ui.notify(f'在歌单[{add_list_select.value}文]中已存在"{add_name.value}"！', color='negative')
+            else:
+                data.append(f"{add_name.value}")
+                try:
+                    with open(f"data/{add_list_select.value}.json", "w+", encoding="utf-8") as f:
+                        json.dump(data, f, ensure_ascii=False, indent=4)
+                    ui.notify(f'已成功在歌单[{add_list_select.value}文]中添加"{add_name.value}"！', color='positive')
+                except:
+                    ui.notify(f'在歌单[{add_list_select.value}文]中添加"{add_name.value}"失败！', color='negative')
+
+    def back() -> None:
+        app.storage.user.update({'authenticated': False})
+        ui.open('/')
+    if not app.storage.user.get('authenticated'):
+        return RedirectResponse('/login')
+
+    ui.query('body').style('background: url("static/bg1.png") 0px 0px/cover')
+    ui.button("返回", on_click=back)
+
+    with ui.card().classes('absolute-center'):
+        ui.badge('YoNi歌单管理处', outline=True, color='', text_color='#E6354F').classes('text-xl')
+        with ui.row():
+            ui.button("添加", on_click=lambda: add_text())
+        with ui.row():
+            add_list_select = ui.select(["中", "日", "英"], value="中")
+            add_name = ui.input(label="歌名")
 
 for dir in os.walk("data"):
     for file in dir[2]:
@@ -12,9 +81,16 @@ for dir in os.walk("data"):
             page = str(file).replace(".json", "")
             pages.append(page)
 
+ui.button("管理", on_click=lambda: ui.open('add'))
+
 with ui.card().classes("absolute-center"):
     ui.query('body').style('background: url("static/bg1.png") 0px 0px')
     ui.badge(f"岚枳的歌单 | {version}", outline=False)
+    notice_label = ui.label('搜索功能目前仅支持全字匹配').classes('text-xs self-start mr-8').style('color: rgb(230 53 79)')
+    with ui.row():
+        target_list_select = ui.select(["中", "日", "英"], value="中")
+        target_name = ui.input(label="关键词")
+        ui.button("搜索", on_click=lambda: search())
     for page in pages:
         _page = ""
         if page == "中":
