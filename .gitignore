@@ -152,3 +152,4 @@ cython_debug/
 #.idea/
 /.nicegui
 user.json
+.DS_Store
