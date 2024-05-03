@@ -7,7 +7,7 @@ from nicegui import ui, app
 from typing import Optional
 from fastapi.responses import RedirectResponse
 
-version = "v1.3.1"
+version = "v1.3.2"
 pages = []
 app.add_static_files('/static', 'static')
 
@@ -158,7 +158,7 @@ def main():
                 ui.button("刷新", on_click=lambda: ui.open('/'))
             notice_label = ui.label('搜索功能目前仅全字匹配').classes('text-xs self-start mr-8').style('color: rgb(230 53 79)')
             with ui.row():
-                target_list_select = ui.select(["中", "日", "英"], value="中")
+                target_list_select = ui.select(["中", "日", "英"], value="中").style("width: 30px")
                 target_name = ui.input(label="关键词").style("width: 110px")
             for page in pages:
                 _page = ""
@@ -200,7 +200,7 @@ def main():
                 ui.button("刷新", on_click=lambda: ui.open('/'))
             notice_label = ui.label('搜索功能目前仅全字匹配').classes('text-xs self-start mr-8').style('color: rgb(230 53 79)')
             with ui.row():
-                target_list_select = ui.select(["中", "日", "英"], value="中")
+                target_list_select = ui.select(["中", "日", "英"], value="中").style("width: 30px")
                 target_name = ui.input(label="关键词").style("width: 110px")
             for page in pages:
                 _page = ""
