@@ -176,7 +176,6 @@ def main():
             match = [value for value in data if re.search(name.value, value)]
             @router.add(f'/{search_id}/result')
             def index():
-                ui.query('body').style('background: url("/static/bg.png") 0px 0px')
                 with ui.row():
                     ui.button("管理", on_click=lambda: ui.open('/admin'))
                     ui.button("返回", on_click=lambda: router.open(f"/{search_id}"))
@@ -199,12 +198,12 @@ def main():
     @router.add(f'/nicegui/{search_id}')
     def index():
         def search():
+            ui.query('body').style('background: url("/nicegui/static/bg1.png") 0px 0px')
             with open(f"data/{target_list_select.value}.json", "r", encoding="utf-8") as f:
                 data = json.load(f)
             match = [value for value in data if re.search(name.value, value)]
             @router.add(f'/nicegui/{search_id}/result')
             def index():
-                ui.query('body').style('background: url("/nicegui/static/bg.png") 0px 0px')
                 with ui.row():
                     ui.button("管理", on_click=lambda: ui.open('/admin'))
                     ui.button("返回", on_click=lambda: router.open(f"/nicegui/{search_id}"))
