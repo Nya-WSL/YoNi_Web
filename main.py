@@ -8,7 +8,7 @@ from nicegui import ui, app
 from typing import Optional
 from fastapi.responses import RedirectResponse
 
-version = "v1.4.2"
+version = "v1.5.2"
 pages = []
 app.add_static_files('/static', 'static')
 
@@ -141,13 +141,31 @@ def main():
 
     @router.add(f'/{page_id}')
     def index():
+        def search():
+            with open(f"data/{target_list_select.value}.json", "r", encoding="utf-8") as f:
+                data = json.load(f)
+            match = [value for value in data if re.search(name.value, value)]
+            with ui.dialog() as dialog, ui.card():
+                with ui.scroll_area().classes('w-96 h-96 border'):
+                    for i in match:
+                        ui.chat_message(i, name="YoNi", avatar='/static/YoNi.jpg').props('bg-color="deep-purple-3"')
+                with ui.row():
+                    ui.button("关闭", on_click=dialog.close)
+                    ui.html(f"""
+关键词：{name.value}<br>
+从{len(data)}个歌名中找到{len(match)}个匹配项""")
+            dialog.open()
+
         ui.button("管理", on_click=lambda: ui.open('/admin'))
         with ui.card().classes("absolute-center"):
             ui.query('body').style('background: url("/static/bg1.png") 0px 0px')
             ui.badge(f"岚枳的歌单 | {version}", outline=False)
             with ui.row():
                 ui.button("刷新", on_click=lambda: ui.open('/'))
-                ui.button("搜索", on_click=lambda: router.open(f"/{search_id}"))
+                ui.button("搜索", on_click=lambda : search())
+            with ui.row():
+                target_list_select = ui.select(["中", "日", "英"], value="中").style("width: 30px")
+                name = ui.input(label="关键词").style("width: 90px")
             for page in pages:
                 _page = ""
                 if page == "中":
@@ -159,7 +177,7 @@ def main():
                 ui.button(page, on_click=lambda _page = _page : ui.open(_page)).classes("w-full")
                 @ui.page(f"/{_page}")
                 def page_view(page = page):
-                    ui.query('body').style('background: url("/static/bg.png") 0px 0px')
+                    ui.query('body').style('background: url("/static/bg1.png") 0px 0px')
                     file = f"data/{page}.json"
                     with open(file, "r", encoding="utf-8") as f:
                         data = json.load(f)
@@ -168,71 +186,32 @@ def main():
                     for text in data:
                         ui.chat_message(text, avatar='/static/YoNi.jpg').props('bg-color="green-1"')
 
-    @router.add(f'/{search_id}')
-    def index():
-        def search():
-            with open(f"data/{target_list_select.value}.json", "r", encoding="utf-8") as f:
-                data = json.load(f)
-            match = [value for value in data if re.search(name.value, value)]
-            @router.add(f'/{search_id}/result')
-            def index():
-                ui.query('body').style('background: url("/static/bg.png") 0px 0px')
-                with ui.row():
-                    ui.button("管理", on_click=lambda: ui.open('/admin'))
-                    ui.button("返回", on_click=lambda: router.open(f"/{search_id}"))
-                with ui.element():
-                    ui.html(f"""<br>
-关键词：{name.value}<br>
-搜索结果：从{len(data)}个歌名中找到{len(match)}个匹配项<br><br>""")
-                    for i in match:
-                        ui.chat_message(i, name="YoNi", avatar='/static/YoNi.jpg').props('bg-color="deep-purple-3"')
-            router.open(f'/{search_id}/result')
-
-        with ui.card().classes("absolute-center") as card:
-            ui.query('body').style('background: url("/static/bg1.png") 0px 0px')
-            ui.badge(f"岚枳的歌单 | {version}", outline=False)
-            with ui.row():
-                target_list_select = ui.select(["中", "日", "英"], value="中").style("width: 30px")
-                name = ui.input(label="关键词")
-                ui.button("搜索", on_click=lambda: search())
-
-    @router.add(f'/nicegui/{search_id}')
-    def index():
-        def search():
-            with open(f"data/{target_list_select.value}.json", "r", encoding="utf-8") as f:
-                data = json.load(f)
-            match = [value for value in data if re.search(name.value, value)]
-            @router.add(f'/nicegui/{search_id}/result')
-            def index():
-                ui.query('body').style('background: url("/nicegui/static/bg.png") 0px 0px')
-                with ui.row():
-                    ui.button("管理", on_click=lambda: ui.open('/admin'))
-                    ui.button("返回", on_click=lambda: router.open(f"/nicegui/{search_id}"))
-                with ui.element():
-                    ui.html(f"""<br>
-关键词：{name.value}<br>
-搜索结果：从{len(data)}个歌名中找到{len(match)}个匹配项<br><br>""")
-                    for i in match:
-                        ui.chat_message(i, name="YoNi", avatar='/nicegui/static/YoNi.jpg').props('bg-color="deep-purple-3"')
-            router.open(f'/nicegui/{search_id}/result')
-
-        ui.query('body').style('background: url("/nicegui/static/bg1.png") 0px 0px')
-        with ui.card().classes("absolute-center") as card:
-            ui.badge(f"岚枳的歌单 | {version}", outline=False)
-            with ui.row():
-                target_list_select = ui.select(["中", "日", "英"], value="中").style("width: 30px")
-                name = ui.input(label="关键词")
-                ui.button("搜索", on_click=lambda: search())
-
     @router.add(f'/nicegui/{page_id}')
     def index():
+        def search():
+            with open(f"data/{target_list_select.value}.json", "r", encoding="utf-8") as f:
+                data = json.load(f)
+            match = [value for value in data if re.search(name.value, value)]
+            with ui.dialog() as dialog, ui.card():
+                with ui.scroll_area().classes('w-96 h-96 border'):
+                    for i in match:
+                        ui.chat_message(i, name="YoNi", avatar='/nicegui/static/YoNi.jpg').props('bg-color="deep-purple-3"')
+                with ui.row():
+                    ui.button("关闭", on_click=dialog.close)
+                    ui.html(f"""
+关键词：{name.value}<br>
+搜索结果：从{len(data)}个歌名中找到{len(match)}个匹配项""")
+            dialog.open()
         ui.button("管理", on_click=lambda: ui.open('/admin'))
         with ui.card().classes("absolute-center"):
             ui.query('body').style('background: url("/nicegui/static/bg1.png") 0px 0px')
             ui.badge(f"岚枳的歌单 | {version}", outline=False)
             with ui.row():
                 ui.button("刷新", on_click=lambda: ui.open('/'))
-                ui.button("搜索", on_click=lambda: router.open(f"/nicegui/{search_id}"))
+                ui.button("搜索", on_click=lambda : search())
+            with ui.row():
+                target_list_select = ui.select(["中", "日", "英"], value="中").style("width: 30px")
+                name = ui.input(label="关键词").style("width: 90px")
             for page in pages:
                 _page = ""
                 if page == "中":
@@ -244,7 +223,7 @@ def main():
                 ui.button(page, on_click=lambda _page = _page : ui.open(_page)).classes("w-full")
                 @ui.page(f"/{_page}")
                 def page_view(page = page):
-                    ui.query('body').style('background: url("/nicegui/static/bg.png") 0px 0px')
+                    ui.query('body').style('background: url("/nicegui/static/bg1.png") 0px 0px')
                     file = f"data/{page}.json"
                     with open(file, "r", encoding="utf-8") as f:
                         data = json.load(f)
