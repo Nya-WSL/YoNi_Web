@@ -1,10 +1,3 @@
-'''
-Author: Nya-WSL
-Copyright © 2023 by Nya-WSL All Rights Reserved. 
-Date: 2023-12-31 16:44:05
-LastEditors: 狐日泽
-LastEditTime: 2023-12-31 16:44:09
-'''
 from typing import Callable, Dict, Union
 
 from nicegui import background_tasks, helpers, ui

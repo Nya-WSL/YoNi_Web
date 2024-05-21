@@ -25,7 +25,7 @@ def index() -> Optional[RedirectResponse]:
 
     ui.query('body').style('background: url("static/bg1.png") 0px 0px/cover')
     with ui.card().classes('absolute-center'):
-        # ui.badge('YoNi登记处', outline=True, color='', text_color='#E6354F').classes('text-xl')
+        # ui.badge('岚枳登记处', outline=True, color='', text_color='#E6354F').classes('text-xl')
         username = ui.input('账号').on('keydown.enter', try_login)
         password = ui.input('密码', password=True, password_toggle_button=True).on('keydown.enter', try_login)
         with ui.row():
@@ -103,7 +103,7 @@ def index():
     ui.button("返回", on_click=back)
 
     with ui.card().classes('absolute-center'):
-        ui.badge('YoNi歌单管理处', outline=True, color='', text_color='#E6354F').classes('text-xl')
+        ui.badge('岚枳歌单管理处', outline=True, color='', text_color='#E6354F').classes('text-xl')
         with ui.row():
             add_list_select = ui.select(["中", "日", "英"], value="中")
             add_name = ui.input(label="歌名")
@@ -148,7 +148,7 @@ def main():
             with ui.dialog() as dialog, ui.card():
                 with ui.scroll_area().classes('w-96 h-96 border'):
                     for i in match:
-                        ui.chat_message(i, name="YoNi", avatar='/static/YoNi.jpg').props('bg-color="deep-purple-3"')
+                        ui.chat_message(i, name="岚枳", avatar='/static/YoNi.jpg').props('bg-color="deep-purple-3"')
                 with ui.row():
                     ui.button("关闭", on_click=dialog.close)
                     ui.html(f"""
@@ -195,7 +195,7 @@ def main():
             with ui.dialog() as dialog, ui.card():
                 with ui.scroll_area().classes('w-96 h-96 border'):
                     for i in match:
-                        ui.chat_message(i, name="YoNi", avatar='/nicegui/static/YoNi.jpg').props('bg-color="deep-purple-3"')
+                        ui.chat_message(i, name="岚枳", avatar='/nicegui/static/YoNi.jpg').props('bg-color="deep-purple-3"')
                 with ui.row():
                     ui.button("关闭", on_click=dialog.close)
                     ui.html(f"""
