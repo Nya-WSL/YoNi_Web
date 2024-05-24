@@ -8,7 +8,7 @@ from nicegui import ui, app
 from typing import Optional
 from fastapi.responses import RedirectResponse
 
-version = "v1.5.2"
+version = "v1.5.3"
 pages = []
 app.add_static_files('/static', 'static')
 
@@ -23,7 +23,7 @@ def index() -> Optional[RedirectResponse]:
         else:
             ui.notify('账号密码错误，请重试！', color='negative')
 
-    ui.query('body').style('background: url("static/bg1.png") 0px 0px/cover')
+    # ui.query('body').style('background: url("static/bg1.png") 0px 0px/cover')
     with ui.card().classes('absolute-center'):
         # ui.badge('岚枳登记处', outline=True, color='', text_color='#E6354F').classes('text-xl')
         username = ui.input('账号').on('keydown.enter', try_login)
@@ -99,7 +99,7 @@ def index():
     if not app.storage.user.get('authenticated'):
         return RedirectResponse('/login')
 
-    ui.query('body').style('background: url("static/bg1.png") 0px 0px/cover')
+    # ui.query('body').style('background: url("static/bg1.png") 0px 0px/cover')
     ui.button("返回", on_click=back)
 
     with ui.card().classes('absolute-center'):
@@ -158,7 +158,7 @@ def main():
 
         ui.button("管理", on_click=lambda: ui.open('/admin'))
         with ui.card().classes("absolute-center"):
-            ui.query('body').style('background: url("/static/bg1.png") 0px 0px')
+            # ui.query('body').style('background: url("/static/bg1.png") 0px 0px')
             ui.badge(f"岚枳的歌单 | {version}", outline=False)
             with ui.row():
                 ui.button("刷新", on_click=lambda: ui.open('/'))
@@ -177,7 +177,7 @@ def main():
                 ui.button(page, on_click=lambda _page = _page : ui.open(_page)).classes("w-full")
                 @ui.page(f"/{_page}")
                 def page_view(page = page):
-                    ui.query('body').style('background: url("/static/bg1.png") 0px 0px')
+                    # ui.query('body').style('background: url("/static/bg1.png") 0px 0px')
                     file = f"data/{page}.json"
                     with open(file, "r", encoding="utf-8") as f:
                         data = json.load(f)
@@ -204,7 +204,7 @@ def main():
             dialog.open()
         ui.button("管理", on_click=lambda: ui.open('/admin'))
         with ui.card().classes("absolute-center"):
-            ui.query('body').style('background: url("/nicegui/static/bg1.png") 0px 0px')
+            # ui.query('body').style('background: url("/nicegui/static/bg1.png") 0px 0px')
             ui.badge(f"岚枳的歌单 | {version}", outline=False)
             with ui.row():
                 ui.button("刷新", on_click=lambda: ui.open('/'))
@@ -223,7 +223,7 @@ def main():
                 ui.button(page, on_click=lambda _page = _page : ui.open(_page)).classes("w-full")
                 @ui.page(f"/{_page}")
                 def page_view(page = page):
-                    ui.query('body').style('background: url("/nicegui/static/bg1.png") 0px 0px')
+                    # ui.query('body').style('background: url("/nicegui/static/bg1.png") 0px 0px')
                     file = f"data/{page}.json"
                     with open(file, "r", encoding="utf-8") as f:
                         data = json.load(f)
@@ -238,4 +238,4 @@ def main():
 def index():
     main()
 
-ui.run(title="岚枳的歌单", favicon="static/icon.png", host="0.0.0.0", port=11455, language="zh-CN", show=False, storage_secret='c2b95787b44c084fc7c7d2c8422917913e0b1a673892f7d1f644bcf73c133410')
+ui.run(title="岚枳的歌单", favicon="static/icon.jpg", host="0.0.0.0", port=11455, language="zh-CN", show=False, storage_secret='c2b95787b44c084fc7c7d2c8422917913e0b1a673892f7d1f644bcf73c133410')
